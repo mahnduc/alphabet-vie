@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tiếng Việt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./theme.css" />
+</head>
+
+<body>
+  <main>
+    <button class="theme" id="theme" type="button" aria-label="Đổi giao diện sáng/tối" title="Đổi giao diện sáng/tối">
+      <i data-lucide="moon" class="ic-moon"></i>
+      <i data-lucide="sun" class="ic-sun"></i>
+    </button>
+    <h1>Bảng ghép vần tiếng Việt</h1>
+    <p class="sub">Nguyên âm xếp theo cột dọc bên trái, phụ âm xếp theo hàng ngang phía trên. Mỗi ô là một từ ví dụ ghép
+      từ phụ âm đứng đầu và nguyên âm ở hàng tương ứng.</p>
+
+    <section class="block">
+      <h2>Nguyên âm đơn</h2>
+      <div class="wrap" tabindex="0" role="region" aria-label="Bảng nguyên âm đơn">
+        <table id="t-single"></table>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Nguyên âm đôi</h2>
+      <!-- <p class="note">Ba nguyên âm đôi: <b>ia – iê</b>, <b>ua – uô</b>, <b>ưa – ươ</b>. Dạng ia, ua, ưa đứng cuối vần
+        (bia, cua, mưa); dạng iê, uô, ươ cần có âm cuối (biển, muốn, hương).</p> -->
+      <div class="wrap" tabindex="0" role="region" aria-label="Bảng nguyên âm đôi">
+        <table id="t-double"></table>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Nguyên âm ba</h2>
+      <div class="wrap" tabindex="0" role="region" aria-label="Bảng nguyên âm ba">
+        <table id="t-triple"></table>
+      </div>
+    </section>
+
+    <div class="legend">
+      <span><i class="sw" style="background:var(--vow)"></i>Nguyên âm (cột dọc)</span>
+      <span><i class="sw" style="background:var(--con)"></i>Phụ âm (hàng ngang)</span>
+      <span><i class="sw" style="background:var(--empty)"></i>Dấu – : không có từ ghép phổ biến</span>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script type="module">
+    import { cons, single, double, triple } from "./data/abc.js";
+
+    function buildTable(id, rows) {
+      var t = document.getElementById(id);
+      var h = "<thead><tr><th class='corner'><span class='c-top'>Phụ âm</span><span class='c-bot'>Nguyên âm</span></th>";
+      cons.forEach(function (c) { h += "<th scope='col'>" + c + "</th>" });
+      h += "</tr></thead><tbody>";
+      rows.forEach(function (r, i) {
+        h += "<tr><th scope='row'>" + r[0] + "</th>";
+        r[1].forEach(function (w, j) {
+          h += w
+            ? "<td data-r='" + i + "' data-c='" + j + "'>" + w + "</td>"
+            : "<td class='empty' data-r='" + i + "' data-c='" + j + "'>–</td>";
+        });
+        h += "</tr>";
+      });
+      t.innerHTML = h + "</tbody>";
+
+      function clearHl() {
+        t.querySelectorAll(".row,.col,.cell").forEach(function (e) { e.classList.remove("row", "col", "cell") });
+      }
+      function hl(td) {
+        clearHl();
+        var r = td.dataset.r, c = td.dataset.c;
+        t.querySelectorAll("td").forEach(function (x) {
+          if (x === td) { x.classList.add("cell") }
+          else if (x.dataset.r === r) { x.classList.add("row") }
+          else if (x.dataset.c === c) { x.classList.add("col") }
+        });
+      }
+      t.addEventListener("mouseover", function (e) { var td = e.target.closest("td"); if (td) hl(td) });
+      t.addEventListener("click", function (e) { var td = e.target.closest("td"); if (td) hl(td) });
+      t.addEventListener("mouseleave", clearHl);
+    }
+
+    buildTable("t-single", single);
+    buildTable("t-double", double);
+    buildTable("t-triple", triple);
+
+    document.getElementById("theme").addEventListener("click", function () {
+      var r = document.documentElement;
+      var dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      r.dataset.theme = dark ? "light" : "dark";
+    });
+
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+
+</html>
